@@ -10,13 +10,22 @@
 // To learn more about the benefits of this model and instructions on how to
 // opt-in, read https://cra.link/PWA
 
+import axios from "axios";
+
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
-    // [::1] is the IPv6 localhost address.
-    window.location.hostname === '[::1]' ||
-    // 127.0.0.0/8 are considered localhost for IPv4.
-    window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/)
+  // [::1] is the IPv6 localhost address.
+  window.location.hostname === '[::1]' ||
+  // 127.0.0.0/8 are considered localhost for IPv4.
+  window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/)
 );
+
+// Keys genereated over the server side (Express in this case)
+// Generated via `webpush` package
+const vapidKeys = {
+  publicKey: 'BJOta691c6vSqcOqEFW_FKJ7uIvb789qJvqmt5R6EfXa_AAcNJ5_SJsBnDtVJvBzTkVOgH7eV2MSX35RuvMXPNg',
+  privateKey: '_xxCPR_ne2lJR-PfkxbIx_WmeNweSFssphbM59XZnAA'
+}
 
 export function register(config) {
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
@@ -41,7 +50,7 @@ export function register(config) {
         navigator.serviceWorker.ready.then(() => {
           console.log(
             'This web app is being served cache-first by a service ' +
-              'worker. To learn more, visit https://cra.link/PWA'
+            'worker. To learn more, visit https://cra.link/PWA'
           );
         });
       } else {
@@ -55,7 +64,22 @@ export function register(config) {
 function registerValidSW(swUrl, config) {
   navigator.serviceWorker
     .register(swUrl)
+    // Start modification for Push Notifications
     .then((registration) => {
+      registration.pushManager.getSubscription()
+        .then(async sub => {
+          // pushSubscription para la conexión al servidor. 
+          const pushSubscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: vapidKeys.publicKey
+          });
+          // Aquí se lo enviamos al servidor
+          await axios.post('http://localhost:8000/subscription', {
+            pushSubscription
+          });
+        });
+      // End modification for Push Notifications
+
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         if (installingWorker == null) {
@@ -69,7 +93,7 @@ function registerValidSW(swUrl, config) {
               // content until all client tabs are closed.
               console.log(
                 'New content is available and will be used when all ' +
-                  'tabs for this page are closed. See https://cra.link/PWA.'
+                'tabs for this page are closed. See https://cra.link/PWA.'
               );
 
               // Execute callback

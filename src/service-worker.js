@@ -70,3 +70,29 @@ self.addEventListener('message', (event) => {
 });
 
 // Any other custom service worker logic can go here.
+const version = "app-compra-v1.5.0";
+
+self.addEventListener('install', (event) => {
+  console.log(`Installing new version ${version}`);
+  self.registration.showNotification("Existe una nueva versión!", {
+    body: "Instalala ahora mismo"
+  })
+});
+
+self.addEventListener('activate', (event) => {
+  console.log(`New version ${version} installed!`)
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data.action === 'checkForUpdate') {
+    // Check if there's a new version of the app available
+    // If there's a new version, show a notification to the user
+  }
+});
+
+self.addEventListener('push', event => {
+  console.log(event);
+  console.log(event.data);
+  const { title, message } = event.data.json();
+  self.registration.showNotification(title, { body: message });
+})
