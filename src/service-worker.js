@@ -91,8 +91,6 @@ self.addEventListener('message', (event) => {
 });
 
 self.addEventListener('push', event => {
-  console.log(event);
-  console.log(event.data);
   const { title, message } = event.data.json();
   self.registration.showNotification(title, { body: message });
 })

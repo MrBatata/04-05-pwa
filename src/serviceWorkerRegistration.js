@@ -64,8 +64,8 @@ export function register(config) {
 function registerValidSW(swUrl, config) {
   navigator.serviceWorker
     .register(swUrl)
-    // Start modification for Push Notifications
     .then((registration) => {
+      // Start modification for Push Notifications
       registration.pushManager.getSubscription()
         .then(async sub => {
           // pushSubscription para la conexión al servidor. 

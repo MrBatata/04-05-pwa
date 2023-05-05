@@ -37,6 +37,7 @@ if ("serviceWorker" in navigator) {
       });
 
       skipWaitingButton.addEventListener("click", async () => {
+        // ! Esto está distinto en el código nuevo!!
         if (registration.waiting) {
           await registration.waiting.postMessage({ type: "SKIP_WAITING" });
           console.log("Sent SKIP_WAITING message to service worker.");
